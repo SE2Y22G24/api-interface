@@ -1,0 +1,454 @@
+openapi: 3.0.0
+info:
+  title: E-invoice sending API
+  version: 1.0.0-oas3
+paths:
+  /user/create:
+    post:
+      tags: 
+        - user
+      summary: creates new user
+      description: |
+        Creates a new user in the database and returns their user_id and a token for the current session.
+      parameters:
+      - in: query
+        name: password
+        description: password for new user
+        required: True
+        schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: password123
+      responses:
+        200:
+          description: user created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+                  user_id:
+                    type: integer
+                    example: 1
+        400:
+          description: no password provided
+          
+  /user/validate:
+    post:
+      tags: 
+        - user
+      summary: validates a user
+      description: Validates a user by creating a new session for them.
+      parameters:
+      - in: query
+        name: user_id
+        description: user id of user
+        required: True
+        schema:
+            type: integer
+      - in: query
+        name: password
+        description: password of user
+        required: True
+        schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                  example: 2
+                password:
+                  type: string
+                  example: password123
+      responses:
+        200:
+          description: user validated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        400:
+          description: password is invalid
+        
+        403:
+          description: user_id is invalid
+                
+  /user/invalidate:
+    post: 
+      tags:
+        - user
+      summary: invalidates a user
+      description: Invalidates a user’s current session.
+      parameters:
+      - in: query
+        name: token
+        description: token of user
+        required: True
+        schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+      responses:
+        200:
+          description: user token is invalidated
+          content:
+            application/html:
+              schema:
+                type: object
+        403:
+          description: token is invalid
+                
+  /invoice/send/email:
+    post:
+      tags:
+        - invoice
+      summary: sends invoice as email
+      description: Send an invoice in the form of email.
+      parameters:
+      - in: query
+        name: xml_data
+        description: raw xml data as string
+        required: True
+        schema:
+            type: string
+      - in: query
+        name: email
+        description: reciever email
+        required: True
+        schema:
+            type: string
+      - in: query
+        name: subject
+        description: email subject
+        required: True
+        schema:
+            type: string
+      - in: query
+        name: message
+        description: email message
+        required: True
+        schema:
+            type: string
+      - in: query
+        name: token
+        description: token of user
+        required: True
+        schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                xml_data:
+                  type: string
+                  example: |
+                          <note>
+                            <to>Tove</to>
+                            <from>Jani</from>
+                            <heading>Reminder</heading>
+                            <body>Don't forget me this weekend!</body>
+                          </note>
+                email:
+                  type: string
+                  example: invoice.sender@gmail.com
+                subject:
+                  type: string
+                  example: invoice
+                message:
+                  type: string
+                  example: here is your invoice
+                token:
+                  type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+      responses:
+        200:
+          description: email has been sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  report_id:
+                    type: integer
+                    example: 1
+        400:
+          description: incorrect email format
+        403:
+          description: token is invalid
+  
+  /invoice/send/SMS:
+    post:
+      tags:
+        - invoice
+      summary: sends invoice as sms
+      description: Send an invoice in the form of SMS.
+      parameters:
+      - in: query
+        name: xml_data
+        description: raw xml data as string
+        required: True
+        schema:
+            type: string
+      - in: query
+        name: number
+        description: number of reciever
+        required: True
+        schema:
+            type: string
+      - in: query
+        name: message
+        description: sms message
+        required: True
+        schema:
+            type: string
+      - in: query
+        name: token
+        description: token of user
+        required: True
+        schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                xml_data:
+                  type: string
+                  example: |
+                          <note>
+                            <to>Tove</to>
+                            <from>Jani</from>
+                            <heading>Reminder</heading>
+                            <body>Don't forget me this weekend!</body>
+                          </note>
+                number:
+                  type: string
+                  example: 61435395359
+                message:
+                  type: string
+                  example: here is your invoice
+                token:
+                  type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+      responses:
+        200:
+          description: sms has been sent
+          content:
+            application/html:
+              schema:
+                type: object
+                properties:
+                  report_id:
+                    type: integer
+                    example: 1
+
+        400:
+          description: phone number not given
+        403:
+          description: token is invalid
+  
+  /report/generate/JSON:
+    get:
+      tags:
+        - report
+      summary: generates json communication report
+      description: Generates communication report in JSON format.
+      parameters:
+        - in: query
+          name: user_id
+          description: The report belongs to this user
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: report_id
+          description: The report that the user wants to see
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: token
+          description: token of user
+          required: true
+          schema:
+            type: string
+      
+      responses:
+        200:
+          description: >-
+            This will generate a communication report of the invoice sending in
+            json
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: integer
+                    example: 1
+                  message_id:
+                    type: integer
+                    example: 2
+                  date_sent:
+                    type: string
+                    example: 11/11/11
+                  reciever_address:
+                    type: string
+                    example: real@email.com
+                  status_code:
+                    type: integer
+                    example: 200
+                  is_sent:
+                    type: boolean
+                    example: true
+                  send_method: 
+                    type: string
+                    example: email
+                  err_message:
+                    type: string
+                    example: Invalid email address
+        400:
+          description: >-
+            token is invalid
+  /report/generate/HTML:
+    get:
+      tags:
+        - report
+      summary: generates html communication report
+      description: Generates communication report in HTML format.
+      parameters:
+        - in: query
+          name: user_id
+          description: The report belongs to this user
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: report_id
+          description: The report that the user wants to see
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: token
+          description: token of user
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: This will generate a communication report of the invoice in html
+          content:
+            application/html:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: integer
+                    example: 1
+                  message_id:
+                    type: integer
+                    example: 2
+                  date_sent:
+                    type: string
+                    example: 11/11/11
+                  reciever_address:
+                    type: string
+                    example: real@email.com
+                  status_code:
+                    type: integer
+                    example: 200
+                  is_sent:
+                    type: boolean
+                    example: true
+                  send_method: 
+                    type: string
+                    example: email
+                  err_message:
+                    type: string
+                    example: Invalid email address
+        400:
+          description: >-
+            token is invalid
+            
+  /report/generate/PDF:
+    get:
+      tags:
+        - report
+      summary: generates pdf communication report
+      description: Generates communication report in PDF format.
+      parameters:
+        - in: query
+          name: user_id
+          description: The report belongs to this user
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: report_id
+          description: The report that the user wants to see
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: token
+          description: token of user
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: >-
+            This will generate a communication report of the invoice sending in
+            pdf
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  report:
+                    type: object
+                    example: this is a pdf file
+  /health_check:
+    get:
+      tags:
+        - health
+      summary: checks health of server
+      description: Checks whether the server is running.
+      responses:
+        200:
+          description: server is running
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  is_alive:
+                    type: boolean
+                    example: true
