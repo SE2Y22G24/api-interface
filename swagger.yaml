@@ -130,7 +130,7 @@ paths:
       parameters:
       - in: query
         name: xml_data
-        description: raw xml data as string
+        description: raw xml data as string (note: when inputting the xml data as a string, use https://www.textcompare.org/json/stringify/ to ensure the format is correct)
         required: True
         schema:
             type: string
