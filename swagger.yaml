@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: E-invoice sending API
-  version: 1.0.0-oas3
+  version: 1.0.0
 paths:
   /user/create:
     post:
@@ -10,13 +10,6 @@ paths:
       summary: creates new user
       description: |
         Creates a new user in the database and returns their user_id and a token for the current session.
-      parameters:
-      - in: query
-        name: password
-        description: password for new user
-        required: True
-        schema:
-            type: string
       requestBody:
         content:
           application/json:
@@ -49,19 +42,6 @@ paths:
         - user
       summary: validates a user
       description: Validates a user by creating a new session for them.
-      parameters:
-      - in: query
-        name: user_id
-        description: user id of user
-        required: True
-        schema:
-            type: integer
-      - in: query
-        name: password
-        description: password of user
-        required: True
-        schema:
-            type: string
       requestBody:
         content:
           application/json:
@@ -70,7 +50,7 @@ paths:
               properties:
                 user_id:
                   type: integer
-                  example: 2
+                  example: 1
                 password:
                   type: string
                   example: password123
@@ -84,6 +64,7 @@ paths:
                 properties:
                   token:
                     type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
         400:
           description: password is invalid
         
@@ -96,13 +77,6 @@ paths:
         - user
       summary: invalidates a user
       description: Invalidates a user’s current session.
-      parameters:
-      - in: query
-        name: token
-        description: token of user
-        required: True
-        schema:
-            type: string
       requestBody:
         content:
           application/json:
@@ -111,6 +85,7 @@ paths:
               properties:
                 token:
                   type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
       responses:
         200:
           description: user token is invalidated
@@ -127,37 +102,6 @@ paths:
         - invoice
       summary: sends invoice as email
       description: Send an invoice in the form of email.
-      parameters:
-      - in: query
-        name: xml_data
-        description: raw xml data as string (note: when inputting the xml data as a string, use https://www.textcompare.org/json/stringify/ to ensure the format is correct)
-        required: True
-        schema:
-            type: string
-      - in: query
-        name: email
-        description: reciever email
-        required: True
-        schema:
-            type: string
-      - in: query
-        name: subject
-        description: email subject
-        required: True
-        schema:
-            type: string
-      - in: query
-        name: message
-        description: email message
-        required: True
-        schema:
-            type: string
-      - in: query
-        name: token
-        description: token of user
-        required: True
-        schema:
-            type: string
       requestBody:
         content:
           application/json:
@@ -175,7 +119,7 @@ paths:
                           </note>
                 email:
                   type: string
-                  example: invoice.sender@gmail.com
+                  example: invoice.receiver@gmail.com
                 subject:
                   type: string
                   example: invoice
@@ -201,37 +145,12 @@ paths:
         403:
           description: token is invalid
   
-  /invoice/send/SMS:
+  /invoice/send/sms:
     post:
       tags:
         - invoice
       summary: sends invoice as sms
       description: Send an invoice in the form of SMS.
-      parameters:
-      - in: query
-        name: xml_data
-        description: raw xml data as string
-        required: True
-        schema:
-            type: string
-      - in: query
-        name: number
-        description: number of reciever
-        required: True
-        schema:
-            type: string
-      - in: query
-        name: message
-        description: sms message
-        required: True
-        schema:
-            type: string
-      - in: query
-        name: token
-        description: token of user
-        required: True
-        schema:
-            type: string
       requestBody:
         content:
           application/json:
@@ -281,14 +200,8 @@ paths:
       description: Generates communication report in JSON format.
       parameters:
         - in: query
-          name: user_id
-          description: The report belongs to this user
-          required: true
-          schema:
-            type: integer
-        - in: query
           name: report_id
-          description: The report that the user wants to see
+          description: report_id of report
           required: true
           schema:
             type: integer
@@ -302,8 +215,7 @@ paths:
       responses:
         200:
           description: >-
-            This will generate a communication report of the invoice sending in
-            json
+            communication report generated
           content:
             application/json:
               schema:
@@ -318,7 +230,7 @@ paths:
                   date_sent:
                     type: string
                     example: 11/11/11
-                  reciever_address:
+                  reciever:
                     type: string
                     example: real@email.com
                   status_code:
@@ -344,14 +256,8 @@ paths:
       description: Generates communication report in HTML format.
       parameters:
         - in: query
-          name: user_id
-          description: The report belongs to this user
-          required: true
-          schema:
-            type: integer
-        - in: query
           name: report_id
-          description: The report that the user wants to see
+          description: report_id of report
           required: true
           schema:
             type: integer
@@ -361,9 +267,10 @@ paths:
           required: true
           schema:
             type: string
+            
       responses:
         200:
-          description: This will generate a communication report of the invoice in html
+          description: communication report generated
           content:
             application/html:
               schema:
@@ -378,7 +285,7 @@ paths:
                   date_sent:
                     type: string
                     example: 11/11/11
-                  reciever_address:
+                  reciever:
                     type: string
                     example: real@email.com
                   status_code:
@@ -405,14 +312,8 @@ paths:
       description: Generates communication report in PDF format.
       parameters:
         - in: query
-          name: user_id
-          description: The report belongs to this user
-          required: true
-          schema:
-            type: integer
-        - in: query
           name: report_id
-          description: The report that the user wants to see
+          description: report_id of report
           required: true
           schema:
             type: integer
@@ -422,11 +323,11 @@ paths:
           required: true
           schema:
             type: string
+            
       responses:
         200:
           description: >-
-            This will generate a communication report of the invoice sending in
-            pdf
+            communication report generated
           content:
             application/json:
               schema:
@@ -435,7 +336,7 @@ paths:
                   report:
                     type: object
                     example: this is a pdf file
-  /health_check:
+  /health/check:
     get:
       tags:
         - health
@@ -452,3 +353,95 @@ paths:
                   is_alive:
                     type: boolean
                     example: true
+  /download/invoice/<id>:
+    get:
+      tags:
+        - invoice
+      summary: given invoice id sends invoice file
+      description: Sends file of invoice to user.
+      parameters:
+        - in: query
+          name: id
+          description: invoice_id of invoice
+          required: true
+          schema:
+            type: string
+            
+      responses:
+        200:
+          description: >-
+            invoice file sent
+components:
+  schemas:
+    user:
+      type: object
+      required:
+        - user_id
+        - password
+      properties:
+        user_id:
+          type: integer
+          example: 1
+        password:
+          type: string
+          example: password123
+        
+    report:
+      type: object
+      properties:
+        report_id:
+          type: integer
+          example: 1
+        user_id:
+          type: integer
+          example: 1
+        time:
+          type: string
+          example: "2022-03-27 10:12:46.337654"
+        reciever:
+          type: string
+          example: reciever.adr@gmail.com
+        status_code:
+          type: integer
+          example: 200
+        is_sent:
+          type: boolean
+          example: true
+        send_method:
+          type: string
+          example: Email
+        err_message:
+          type: string
+          example: email address was invalid
+        
+      xml:
+        name: Category
+    token:
+      type: object
+      properties:
+        session_id:
+          type: string
+          example: e5f6c4ef-ed53-4885-8893-cd3ea3f7f2c8
+        user_id:
+          type: integer
+          example: 1
+        
+    invoice:
+      type: object
+      properties:
+        invoice_id:
+          type: integer
+          example: 1
+        xml_data:
+          type: string
+          example: <note>\n  <to>Tove</to>\n  <from>Jani</from>\n  <heading>Reminder</heading>\n  <body>Don't forget me this weekend!</body>\n</note>\n
+      
+    
+  
+
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/SE2Y22G24/e-invoice-sending/1.0.0
+  - description: Deployed application
+    url: https://e-invoice-sending-app.herokuapp.com
