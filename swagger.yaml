@@ -341,14 +341,14 @@ paths:
                   is_alive:
                     type: boolean
                     example: true
-  /download/invoice/<id>:
+  /download/invoice/{id}:
     get:
       tags:
         - invoice
       summary: given invoice id sends invoice file
       description: Sends file of invoice to user.
       parameters:
-        - in: query
+        - in: path
           name: id
           description: invoice_id of invoice
           required: true
