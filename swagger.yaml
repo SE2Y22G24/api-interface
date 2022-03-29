@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: E-invoice sending API
-  version: 1.0.0
+  version: 1.0.1
 paths:
   /user/create:
     post:
@@ -383,7 +383,7 @@ paths:
                     type: integer
                     example: 30
                   up_time (measured in seconds):
-                    type: float
+                    type: number
                     example: 18.640183448791504
 components:
   schemas:
