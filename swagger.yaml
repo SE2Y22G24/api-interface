@@ -179,6 +179,24 @@ paths:
           description: phone number not given
         403:
           description: token is invalid
+  /download/invoice/{id}:
+    get:
+      tags:
+        - invoice
+      summary: given invoice id sends invoice file
+      description: Sends file of invoice to user.
+      parameters:
+        - in: path
+          name: id
+          description: invoice_id of invoice
+          required: true
+          schema:
+            type: string
+            
+      responses:
+        200:
+          description: >-
+            invoice file sent
   
   /report/generate/JSON:
     get:
@@ -341,24 +359,32 @@ paths:
                   is_alive:
                     type: boolean
                     example: true
-  /download/invoice/{id}:
+  /health/check/v2:
     get:
       tags:
-        - invoice
-      summary: given invoice id sends invoice file
-      description: Sends file of invoice to user.
-      parameters:
-        - in: path
-          name: id
-          description: invoice_id of invoice
-          required: true
-          schema:
-            type: string
-            
+        - health
+      summary: checks health of server
+      description: Checks whether the server is running and includes some added statistics.
       responses:
         200:
-          description: >-
-            invoice file sent
+          description: server is running
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  is_alive:
+                    type: boolean
+                    example: true
+                  database_alive:
+                    type: boolean
+                    example: true
+                  invoices_sent:
+                    type: integer
+                    example: 30
+                  up_time (measured in seconds):
+                    type: float
+                    example: 18.640183448791504
 components:
   schemas:
     user:
