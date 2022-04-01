@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: E-invoice sending API
-  version: 1.0.1
+  version: 1.0.2
 paths:
   /user/create:
     post:
@@ -342,6 +342,84 @@ paths:
                   report:
                     type: object
                     example: this is a pdf file
+
+  /report/delete:
+    post:
+      tags:
+        - report
+      summary: deletes a report
+      description: >-
+        This will delete a communication report from the database.
+      parameters:
+      - in: query
+        name: token
+        description: The token belonging to the user
+        required: true
+        schema: 
+          type: string
+      - in: query
+        name: report_id
+        description: the report the user wants to delete
+        required: true
+        schema: 
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+                report_id:
+                  type: integer
+                  example: 147
+      responses:
+        200:
+          description: report deleted
+          content:
+            application/html:
+              schema:
+                type: object
+  
+  /report/list:
+    post:
+      tags:
+        - report
+      summary: finds a list of report ids
+      description: >-
+        This will find in the database all report id that have been created by the given user id
+      parameters:
+      - in: query
+        name: token
+        description: the token belonging to the user
+        required: True
+        schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+      responses:
+        200:
+          description: list of reports
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reports: 
+                    type: array
+                    items:
+                      type: integer
+                      example: 1
+              
   /health/check:
     get:
       tags:
