@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: E-invoice sending API
-  version: 1.0.2
+  version: 1.0.3
 paths:
   /user/create:
     post:
