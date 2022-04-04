@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: E-invoice sending API
-  version: 1.0.3
+  version: 1.1.3
 paths:
   /user/create:
     post:
@@ -9,7 +9,7 @@ paths:
         - user
       summary: creates new user
       description: |
-        Creates a new user in the database and returns their user_id and a token for the current session.
+        Creates a new user in the database and returns their user_id and a token for the current session. This no longer works, use /user/create/v2
       requestBody:
         content:
           application/json:
@@ -35,13 +35,62 @@ paths:
                     example: 1
         400:
           description: no password provided
+
+  /user/create/v2:
+    post:
+      tags: 
+        - user
+      summary: creates new user
+      description: |
+        Creates a new user in the database and returns their user_id and a token for the current session.
+      parameters:
+      - in: query
+        name: password
+        description: password for new user
+        required: True
+        schema:
+            type: string
+      - in: query
+        name: email
+        description: email for new user
+        required: True
+        schema: 
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: password123
+                email: 
+                  type: string
+                  example: real@email.com
+      responses:
+        200:
+          description: user created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+                  user_id:
+                    type: integer
+                    example: 1
+        400:
+          description: no password or email provided
           
   /user/validate:
     post:
       tags: 
         - user
       summary: validates a user
-      description: Validates a user by creating a new session for them.
+      description: Validates a user by creating a new session for them. This no longer works, use /user/validate/v2
       requestBody:
         content:
           application/json:
@@ -95,6 +144,53 @@ paths:
                 type: object
         403:
           description: token is invalid
+
+  /user/validate/v2:
+    post:
+      tags: 
+        - user
+      summary: validates a user
+      description: Validates a user by creating a new session for them.
+      parameters:
+      - in: query
+        name: email
+        description: email of user
+        required: True
+        schema:
+            type: string
+      - in: query
+        name: password
+        description: password of user
+        required: True
+        schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: real@email.com
+                password:
+                  type: string
+                  example: password123
+      responses:
+        200:
+          description: user validated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        400:
+          description: password is invalid
+        
+        403:
+          description: email is invalid
                 
   /invoice/send/email:
     post:
