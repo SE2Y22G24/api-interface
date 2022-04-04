@@ -43,19 +43,6 @@ paths:
       summary: creates new user
       description: |
         Creates a new user in the database and returns their user_id and a token for the current session.
-      parameters:
-      - in: query
-        name: password
-        description: password for new user
-        required: True
-        schema:
-            type: string
-      - in: query
-        name: email
-        description: email for new user
-        required: True
-        schema: 
-            type: string
       requestBody:
         content:
           application/json:
@@ -151,19 +138,6 @@ paths:
         - user
       summary: validates a user
       description: Validates a user by creating a new session for them.
-      parameters:
-      - in: query
-        name: email
-        description: email of user
-        required: True
-        schema:
-            type: string
-      - in: query
-        name: password
-        description: password of user
-        required: True
-        schema:
-            type: string
       requestBody:
         content:
           application/json:
